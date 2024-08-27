@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Fim</title>
+    <style>
+        body {
+            text-align: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; 
+            margin: 0; 
+            background-color: black;
+        }
+
+        p {
+            font-size: 24px;
+            margin: 0 0 10px 0;
+            color:white;
+        }
+
+        #pontuacaoFinal {
+            font-size: 18px;
+            margin-bottom: 20px; 
+            color:white;
+        }
+
+        #Reiniciar {
+            font-size: 16px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+        }
+
+        #Reiniciar:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <p>Game Over</p>
+    <div id="pontuacaoFinal">Pontuação Final: 0</div>
+    <button id="Reiniciar">Jogar Novamente</button>
+
+    <script>
+       
+        var pontuacaoFinal = localStorage.getItem('pontuacaoFinal');
+        
+        document.getElementById('pontuacaoFinal').textContent = 'Pontuação Final: ' + (pontuacaoFinal || 0);
+        
+        localStorage.removeItem('pontuacaoFinal');
+
+        document.getElementById('Reiniciar').addEventListener('click', function() {
+            window.location.href = 'jogo.html';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Jogo</title>
+    <style>
+        .dot {
+            height: 10px;
+            width: 10px;
+            position: absolute;
+            border-radius: 0;
+            background-color: rgb(245, 6, 6);
+            box-sizing: border-box;
+        }
+
+        .player {
+            height: 6px; 
+            width: 6px;  
+            position: absolute;
+            border-radius: 0;
+            background-color: rgb(28, 7, 255);
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 700px;
+            height: 800px;
+            margin: 0 auto;
+            padding: 0;
+            border: 1px solid white;
+            position: relative;
+            overflow: hidden;
+            background-color: black;
+            cursor:none;
+        }
+
+        #contador {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 5px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+
+        #Velocidade {
+            position: absolute;
+            top: 40px;
+            right: 10px;
+            background: white;
+            padding: 5px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="contador">Pontuação: 0</div>
+    <div id="Velocidade">Velocidade: 200</div>
+
+    <script>
+        var contador = 0;
+        var intervaloBase = 200; // Intervalo inicial para adicionar dots
+        var intervaloColisao = 50; // Intervalo para verificar colisão
+        var player = null;
+        var tempoParaAdicionarDot = intervaloBase; // Tempo restante até adicionar o próximo dot
+
+        function atualizarContador() {
+            document.getElementById('contador').textContent = 'Pontuação: ' + contador;
+        }
+
+        function atualizarVelocidade() {
+            document.getElementById('Velocidade').textContent = 'Velocidade: ' + tempoParaAdicionarDot;
+        }
+
+        function adicionarDot() {
+            var X = 0;
+            var Y = 0;
+            var random = Math.floor(Math.random() * 2);
+            
+            var dot = document.createElement("div");
+            dot.className = "dot";
+            
+            contador++;
+            atualizarContador();
+
+            if (random === 1) {
+                X = Math.floor(Math.random() * 690);
+                dot.style.left = X + "px";
+                dot.style.top = "0px"; 
+                document.body.appendChild(dot);
+                var descer = setInterval(function() {
+                    var Topo = parseInt(dot.style.top);
+                    if (Topo < 790) {
+                        dot.style.top = (Topo + 10) + "px";
+                    } else {
+                        if (document.body.contains(dot)) {
+                            document.body.removeChild(dot);
+                        }
+                        clearInterval(descer);
+                    }
+                }, 20);
+
+            } else {
+                Y = Math.floor(Math.random() * 790);
+                dot.style.left = "0px";
+                dot.style.top = Y + "px";
+                document.body.appendChild(dot);
+
+                var MoverDireita = setInterval(function() {
+                    var Esquera = parseInt(dot.style.left);
+                    if (Esquera < 690) {
+                        dot.style.left = (Esquera + 10) + "px";
+                    } else {
+                        if (document.body.contains(dot)) {
+                            document.body.removeChild(dot);
+                        }
+                        clearInterval(MoverDireita);
+                    }
+                }, 20);
+            }
+            atualizarVelocidade();
+        }
+
+        function verificarColisoes() {
+            var dots = document.querySelectorAll('.dot');
+            if (!player) return;
+
+            dots.forEach(dot => {
+                var hitboxDot = dot.getBoundingClientRect();
+                var dotX = hitboxDot.left;
+                var dotY = hitboxDot.top;
+                var dotWidth = hitboxDot.width;
+                var dotHeight = hitboxDot.height;
+
+                var hitboxPlayer = player.getBoundingClientRect();
+                var playerX = hitboxPlayer.left;
+                var playerY = hitboxPlayer.top;
+                var playerWidth = hitboxPlayer.width;
+                var playerHeight = hitboxPlayer.height;
+
+                if (
+                    playerX + playerWidth > dotX &&
+                    playerX < dotX + dotWidth &&
+                    playerY + playerHeight > dotY &&
+                    playerY < dotY + dotHeight
+                ) {
+                    localStorage.setItem('pontuacaoFinal', contador);
+                    window.location.href = 'GameOver.html';
+                }
+            });
+        }
+
+        function atualizarTempoParaAdicionarDot() {
+            tempoParaAdicionarDot = Math.max(25, tempoParaAdicionarDot - 0.5);
+            atualizarVelocidade();
+        }
+
+        function iniciarJogo() {
+            adicionarDot();
+            setTimeout(function() {
+                iniciarJogo();
+            }, tempoParaAdicionarDot);
+            atualizarTempoParaAdicionarDot();
+        }
+
+        setInterval(verificarColisoes, intervaloColisao);
+
+        addEventListener("mousemove", function(event) {
+            if (!player) {
+                player = document.createElement("div");
+                player.className = "player";
+                document.body.appendChild(player);
+            }
+
+            var bodyRect = document.body.getBoundingClientRect();
+            
+            var x = event.clientX - bodyRect.left;
+            var y = event.clientY - bodyRect.top;
+
+            x = Math.max(0, Math.min(x - 3, bodyRect.width - 6));
+            y = Math.max(0, Math.min(y - 3, bodyRect.height - 6));
+
+            player.style.left = (x) + "px";
+            player.style.top = (y) + "px";
+        });
+
+        iniciarJogo();
+    </script>
+</body>
+</html>
